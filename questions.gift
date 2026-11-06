@@ -1,0 +1,285 @@
+// ==============================================================================
+// MediQuick V2 - Pharmacy Billing System
+// Comprehensive GIFT Assessment File (35 Multiple Choice Questions)
+// Compatible with Moodle, Canvas, Blackboard, and GIFT parsers
+// ==============================================================================
+
+// Question 1: System Purpose & Operating Environment
+::Q01_SystemPurpose:: What is the primary purpose and operational environment of the MediQuick application? {
+    =A console-based pharmacy billing system designed for counter computers in campus health stores serving Staff and Customers.
+    ~A cloud-native microservices backend exposing gRPC endpoints for automated robotic dispensing.
+    ~A mobile web application built with React and FastAPI to manage pharmaceutical supply chains.
+    ~A desktop GUI application built with Tkinter for managing pharmaceutical wholesale imports.
+}
+
+// Question 2: Architecture & Class Structure
+::Q02_ArchitecturePrinciples:: How does the MediQuick project structure enforce clean Object-Oriented Programming (OOP) design? {
+    =By adhering to the Single Responsibility Principle with one primary class per file (such as Cart, Medicine, and Pharmacy).
+    ~By combining all models, business logic, and UI code into a single monolithic script to avoid imports.
+    ~By relying entirely on functional programming paradigms without custom classes.
+    ~By generating data models dynamically at runtime using eval() and JSON schemas.
+}
+
+// Question 3: Staff Flow Authentication
+::Q03_StaffAuthentication:: In app/ui.py, what password is required to access the Staff menu, and what happens if an incorrect password is entered? {
+    =The password is "admin123"; an incorrect entry displays a warning and immediately returns the user to the main menu.
+    ~The password is "admin"; an incorrect entry locks the terminal after 3 failed attempts.
+    ~The password is "pharmacy2026"; an incorrect entry prompts the user indefinitely until the correct password is provided.
+    ~There is no password authentication; any user can enter the Staff menu freely.
+}
+
+// Question 4: Medicine Validation Constraints
+::Q04_MedicineValidation:: When instantiating a Medicine object in app/models/medicine.py, which condition will raise a ValueError? {
+    =If price is less than or equal to 0, stock is less than 0, or rx is not 'Y' or 'N'.
+    ~If price is greater than 1000 or stock is greater than 100.
+    ~If medicine name contains spaces or lowercase characters.
+    ~If category is not pre-registered in an external database table.
+}
+
+// Question 5: Medicine Stock Reduction Logic
+::Q05_MedicineReduceStock:: What happens when Medicine.reduce_stock(quantity) is called with a quantity that exceeds the current stock? {
+    =An InsufficientStockError is raised and the stock level remains unchanged.
+    ~The stock level becomes negative and an error log is written to a file.
+    ~The method automatically resets the stock to zero without raising an exception.
+    ~A standard ValueError is raised and the order is placed on backorder.
+}
+
+// Question 6: Custom Domain Exception Definition
+::Q06_CustomException:: How is InsufficientStockError defined in app/exceptions/insufficient_stock_error.py? {
+    =As a custom domain exception inheriting directly from Python's built-in Exception.
+    ~As a subclass of RuntimeError that automatically catches file I/O errors.
+    ~As a FastAPI HTTP exception subclassing fastapi.HTTPException with status code 400.
+    ~As an enumeration class inheriting from enum.Enum.
+}
+
+// Question 7: Cart Internal Data Structure
+::Q07_CartDataStructure:: How does the Cart class in app/models/cart.py store items internally? {
+    =In a dictionary where medicine codes map to nested dictionaries containing the Medicine instance and quantity.
+    ~In a flat list of tuples containing only medicine name and price.
+    ~In an SQLite in-memory table queried using SQLAlchemy ORM.
+    ~In a Python set of serialized JSON strings.
+}
+
+// Question 8: Repeated Item Addition in Cart
+::Q08_CartRepeatedAddition:: What occurs when a customer adds a medicine to the cart that is already present in cart.items? {
+    =The quantity of the existing line item is incremented after verifying the combined quantity does not exceed available stock.
+    ~A second identical item entry is appended to create duplicate lines in the cart.
+    ~The previous item is overwritten and its quantity is reset to the newly requested value.
+    ~An AlreadyInCartError is raised, rejecting the addition.
+}
+
+// Question 9: Cart Stock Availability Check
+::Q09_CartStockCheck:: Before adding an item to Cart, how does Cart.add(medicine, quantity) prevent requesting more than available inventory? {
+    =It checks if in_cart + quantity > medicine.stock and raises InsufficientStockError if true.
+    ~It checks if medicine.stock \=\= 0 only, ignoring previously added cart quantities.
+    ~It immediately reduces the stock attribute on the Medicine object before adding to cart.
+    ~It sends an asynchronous query to the database to lock rows.
+}
+
+// Question 10: GST Calculation and Rate
+::Q10_GSTCalculation:: What is the Goods and Services Tax (GST) percentage applied by MediQuick, and how is it calculated in Cart.calculate_gst()? {
+    =A flat rate of 12% calculated as round(subtotal * 0.12, 2).
+    ~A progressive rate of 5%, 12%, or 18% based on the medicine category.
+    ~A flat rate of 18% calculated as round(subtotal * 0.18, 2).
+    ~A fixed fee of 12 currency units added to each transaction regardless of subtotal.
+}
+
+// Question 11: Grand Total Calculation
+::Q11_GrandTotalCalculation:: In Cart.calculate_grand_total(), how is the grand total determined? {
+    =By summing subtotal and GST, then rounding to 2 decimal places: round(subtotal + gst, 2).
+    ~By multiplying subtotal by 1.12 without rounding.
+    ~By deducting customer loyalty discounts from subtotal and adding GST.
+    ~By rounding subtotal to the nearest integer and adding a flat tax of 12.00.
+}
+
+// Question 12: Cart Item Removal
+::Q12_CartItemRemoval:: What does Cart.remove(code) do when an existing medicine code is provided? {
+    =It removes the item entry from self.items using self.items.pop(code.strip().upper(), None) and returns True.
+    ~It decrements the quantity of that item by 1 and keeps the item in the cart.
+    ~It raises an exception if the item cannot be refunded.
+    ~It sets the item quantity to 0 while keeping the key in self.items.
+}
+
+// Question 13: Order Number Generation and Session State
+::Q13_OrderNumberGeneration:: How are order numbers assigned and tracked during a MediQuick console session? {
+    =The order counter starts at 1001 inside a session state dictionary and increments by 1 after each successful order.
+    ~Order numbers are generated as random 128-bit UUID strings for each order.
+    ~Order numbers are calculated from the total row count in medicines.csv.
+    ~Order numbers reset to 1 every time the customer enters the customer menu.
+}
+
+// Question 14: Data Persistence Storage Format
+::Q14_PersistenceFormat:: What file format and header columns are used for persistent data storage in MediQuick? {
+    =CSV format (medicines.csv) with columns: code,name,category,price,stock,rx.
+    ~JSON format (medicines.json) containing an array of medicine objects.
+    ~SQLite database (pharmacy.db) with tables for medicines and invoices.
+    ~YAML configuration (inventory.yaml) with nested category mappings.
+}
+
+// Question 15: Missing Data File Handling (Resilience)
+::Q15_MissingFileHandling:: In Pharmacy.load_from_csv(), what happens if medicines.csv does not exist on disk? {
+    =FileNotFoundError is caught, a warning message is printed, and the pharmacy starts with an empty dictionary without crashing.
+    ~The program immediately raises an unhandled exception and crashes.
+    ~A default medicines.csv file is automatically downloaded from a remote server.
+    ~The application terminates with exit code 1.
+}
+
+// Question 16: File Writing and Synchronization Trigger
+::Q16_FileSaveTriggers:: When is Pharmacy.save_to_csv() invoked to persist inventory changes to disk? {
+    =Immediately after adding a medicine, updating a medicine's price/stock, or finalizing an order checkout.
+    ~Only once when the user selects the "Exit" option in the main menu.
+    ~Periodically every 5 minutes using a background daemon thread.
+    ~Only when the Staff explicitly runs a manual "Save Database" command.
+}
+
+// Question 17: Inventory Lookup Time Complexity
+::Q17_LookupComplexity:: In Pharmacy, how are medicines stored in memory and what is the lookup time complexity for get_medicine(code)? {
+    =Stored in a dictionary self.medicines keyed by uppercase item code, providing O(1) average lookup time.
+    ~Stored in a linked list, requiring O(N) sequential search for every lookup.
+    ~Stored in a sorted array, requiring O(log N) binary search.
+    ~Read directly from disk on each call, requiring O(N) file I/O operations.
+}
+
+// Question 18: Medicine Search Logic
+::Q18_SearchLogic:: How does Pharmacy.search_by_name(query) match medicines against a customer search query? {
+    =It performs a case-insensitive substring search across medicine.name for all catalog items.
+    ~It performs an exact match comparison on the medicine code only.
+    ~It uses Levenshtein distance fuzzy matching with a 75% similarity threshold.
+    ~It searches only within items marked as Wellness or Tablets.
+}
+
+// Question 19: Out of Stock Medicine Display Behavior
+::Q19_OutOfStockDisplay:: In display_medicines() in app/ui.py, how is a medicine with zero stock displayed to users? {
+    =Its stock column displays the string "Out of stock" instead of the number 0.
+    ~The medicine is omitted from the table entirely.
+    ~The row is printed with red ANSI escape codes and an exclamation mark.
+    ~The price column is replaced with "N/A".
+}
+
+// Question 20: Prescription (Rx) Enforcement Workflow
+::Q20_RxEnforcement:: What validation occurs in customer_add() when a customer attempts to add a medicine marked with rx \=\= "Y"? {
+    =The user is prompted whether they have a valid prescription; if they answer 'n', the item is not added to the cart.
+    ~The system demands an upload of an image file containing a doctor's signature.
+    ~Prescription medicines can only be purchased by logging in as Staff.
+    ~The item is added to cart, but marked as pending approval until counter pickup.
+}
+
+// Question 21: Robust Integer Input Handling (prompt_int)
+::Q21_PromptIntValidation:: How does prompt_int(msg, min_val) in app/ui.py handle invalid inputs (such as non-numeric text or values below min_val)? {
+    =It traps ValueError, prints an informative error message, and loops continuously until valid input satisfying min_val is provided.
+    ~It immediately raises ValueError to terminate the application.
+    ~It converts invalid input to a default fallback value of 0.
+    ~It logs a warning to stderr and returns None.
+}
+
+// Question 22: Yes/No Input Validation (prompt_yes_no)
+::Q22_PromptYesNo:: What input is accepted by the prompt_yes_no() helper function in app/ui.py? {
+    =Strictly 'y' or 'n' (case-insensitive); any other input displays "Please enter 'y' or 'n'." and re-prompts.
+    ~Any string starting with 'y' (such as 'yes', 'yeah') or 'n' (such as 'no', 'nope').
+    ~Numeric inputs 1 (for yes) and 0 (for no) exclusively.
+    ~Pressing Enter defaults automatically to 'yes'.
+}
+
+// Question 23: Application Interruption and Graceful Shutdown
+::Q23_GracefulShutdown:: How does app/main.py handle user termination signals such as KeyboardInterrupt (Ctrl+C) or EOFError? {
+    =It catches (KeyboardInterrupt, EOFError), prints "MediQuick session ended.", and exits cleanly with sys.exit(0).
+    ~It allows the raw Python traceback to be displayed on the console.
+    ~It triggers an automatic system restart.
+    ~It writes a core dump file to the root directory before raising the signal.
+}
+
+// Question 24: Checkout Order Fulfillment Workflow
+::Q24_OrderFulfillment:: In customer_order(), what is the exact sequence of actions taken upon a successful checkout? {
+    =Reduce stock on each cart medicine, persist changes to CSV, calculate totals, print the bill, increment order number, and clear the cart.
+    ~Print the bill, clear the cart, and prompt the customer whether to save inventory to CSV.
+    ~Increment the order number, delete the cart object, and restart the main menu loop without updating stock.
+    ~Write the bill to a PDF file, send an email to staff, and keep items in the cart.
+}
+
+// Question 25: Medicine Code Normalization
+::Q25_MedicineCodeNormalization:: When creating a Medicine instance with code "  t01  ", how does Medicine.__init__ normalize the code attribute? {
+    =It trims leading and trailing whitespace and converts the characters to uppercase, resulting in "T01".
+    ~It retains the lowercase characters but trims whitespace, resulting in "t01".
+    ~It raises a ValueError stating that codes must not contain whitespace.
+    ~It prefixes the string with the pharmacy category code.
+}
+
+// Question 26: Negative or Zero Quantity Validation
+::Q26_NonPositiveQuantityValidation:: What occurs if a non-positive quantity (such as 0 or -3) is passed to Medicine.reduce_stock() or Cart.add()? {
+    =A ValueError is raised with the message "Quantity must be positive.".
+    ~An InsufficientStockError is raised indicating an invalid quantity.
+    ~The function treats the quantity as 1 and proceeds without error.
+    ~The call is silently ignored and returns False.
+}
+
+// Question 27: Out of Stock Evaluation Logic
+::Q27_IsOutOfStockMethod:: In Medicine.is_out_of_stock(), what exact condition determines whether an item is considered out of stock? {
+    =The method returns True if self.stock <\= 0, otherwise False.
+    ~The method returns True only if self.stock \=\= 0 and self.rx \=\= 'N'.
+    ~The method returns True if self.stock is less than a safety threshold of 5 units.
+    ~The method inspects the CSV file directly to see if the stock column has been cleared.
+}
+
+// Question 28: Cart Calculate Totals Tuple
+::Q28_CartCalculateTotals:: What data structure and sequence of values does Cart.calculate_totals() return? {
+    =A 3-element tuple containing (subtotal, gst, grand_total).
+    ~A dictionary with keys "subtotal", "tax", and "final_amount".
+    ~A single float representing the grand total after tax.
+    ~A list of strings formatted as currency amounts.
+}
+
+// Question 29: Price Input Float Validation (prompt_float)
+::Q29_PromptFloatValidation:: How does the prompt_float(msg) helper in app/ui.py validate customer or staff price inputs? {
+    =It traps ValueError, ensures the converted float is strictly greater than zero, and returns round(num, 2).
+    ~It permits zero and negative prices to accommodate free promotional items.
+    ~It truncates all decimals and converts the value to an integer price.
+    ~It automatically converts foreign currency symbols into Indian Rupees.
+}
+
+// Question 30: Blank Input Prevention (prompt_str)
+::Q30_PromptStrValidation:: How does prompt_str(msg) in app/ui.py handle empty submissions or strings containing only whitespace? {
+    =It prints "Input cannot be blank. Please try again." and continues looping until a non-blank string is provided.
+    ~It returns an empty string "" allowing calling functions to use default values.
+    ~It raises an EOFError and exits the program cleanly.
+    ~It assigns a default string "N/A" to the field.
+}
+
+// Question 31: Duplicate Medicine Code Prevention in Staff Flow
+::Q31_StaffDuplicateCodeCheck:: In staff_add(), how does the interface prevent adding a medicine with an item code that is already in use? {
+    =It checks pharmacy.get_medicine(code) and displays "Item code '<code'> already exists. Choose a unique code." until a new code is entered.
+    ~It overwrites the existing medicine without warning the user.
+    ~It appends an incremental numeric suffix to the duplicate code automatically.
+    ~It raises an unhandled DuplicateKeyError that crashes the application.
+}
+
+// Question 32: Partial Inventory Updates in Staff Flow
+::Q32_StaffUpdatePartial:: In Pharmacy.update_medicine(code, price=None, stock=None), how does the system support updating only one field (e.g. stock only)? {
+    =It checks if each parameter is not None before updating, leaving any omitted field at its current value before saving.
+    ~It requires both price and stock to always be supplied together.
+    ~It resets omitted fields to zero if not explicitly passed.
+    ~It creates a duplicate medicine record with updated values.
+}
+
+// Question 33: CSV Price Number Formatting
+::Q33_CsvPriceFormatting:: In Pharmacy.save_to_csv(), how is the medicine price formatted when written to medicines.csv if the price has no fractional cents (e.g. 25.0)? {
+    =It formats whole-number prices as integers (e.g. 25) using int(m.price) if m.price.is_integer().
+    ~It always writes exactly four decimal places for all numbers.
+    ~It prepends a currency symbol like "$" or "Rs." to the number.
+    ~It rounds all prices up to the nearest multiple of 10.
+}
+
+// Question 34: Session Cart State Preservation
+::Q34_SessionCartStatePreservation:: If a customer adds medicines to their cart, navigates back to the Main Menu (Option 6: Back), and subsequently returns to the Customer Menu, what happens to their cart? {
+    =The cart items are preserved because the Cart instance is maintained in main_menu() throughout the session.
+    ~The cart is automatically wiped clean whenever the customer exits the Customer Menu.
+    ~The cart items are automatically checked out and billed immediately upon leaving the Customer Menu.
+    ~The cart contents are written to a temporary cache file on disk and reloaded.
+}
+
+// Question 35: Empty Cart Checkout Guard
+::Q35_EmptyCartCheckoutGuard:: What occurs in customer_order() if a customer chooses "Place order" when cart.is_empty() is True? {
+    =It displays "Your cart is empty. Nothing to place." and returns to the menu without changing inventory or generating a bill.
+    ~It generates an empty receipt with an order number and zero total.
+    ~It automatically adds a default promotional item to the cart and checks out.
+    ~It raises an InsufficientStockError and returns to the main menu.
+}

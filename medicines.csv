@@ -1,0 +1,7 @@
+code,name,category,price,stock,rx
+T01,Paracetamol 500mg,Tablets,25,60,N
+T02,Amoxicillin 250mg,Tablets,85,8,Y
+S01,Cough Syrup 100ml,Syrups,70,20,N
+F01,Antiseptic Cream 20g,First Aid,45,0,N
+F02,Cotton Roll 100g,First Aid,30,15,N
+W01,Vitamin C (30 tabs),Wellness,120,25,N

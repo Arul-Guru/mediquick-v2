@@ -1,0 +1,5 @@
+test:
+  image: "evolv/python-3.12"
+  command: "pip install -q -r requirements.txt && python -m pytest -q --junitxml=reports/out.xml"
+  reports: "reports/*.xml"
+  timeout: 300
